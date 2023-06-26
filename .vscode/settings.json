@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "sqlite",
+            "group": "sqlite",
+            "database": "${workspaceFolder:tradeflow-api}/var/data.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
