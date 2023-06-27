@@ -65,8 +65,14 @@ class UserController extends AbstractController
     }
 
     #[Route('/create', name: 'create', methods: ['POST'])]
-    public function create(Request $request)
+    #[Route('/edit/{id}', name: 'edit', methods: ['PUT'])]
+    public function create(?User $user, Request $request): JsonResponse
     {
+        $isCreation = false;
+        if(!$user instanceof User) {
+            $user = new User();
+            $isCreation = true;
+        }
         // create a user using validator on the request content (json)
         $validator = Validation::createValidator();
 
@@ -88,17 +94,20 @@ class UserController extends AbstractController
             ], 400);
         }
 
-        $user = $this->userRepository->findOneBy(['username' => $content['username']]);
+        if ($isCreation || $user->getUsername() !== $content['username']) {
+            $foundedUser = $this->userRepository->findOneBy(['username' => $content['username']]);
 
-        if ($user) {
-            return $this->json([
-                'message' => 'Username already exists'
-            ], 400);
+            if ($foundedUser) {
+                return $this->json([
+                    'message' => 'Username already exists'
+                ], 400);
+            }
         }
 
-        $user = new User();
         $user->setUsername($content['username']);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $content['password']));
+        if ($isCreation || $content['password'] !== null) {
+            $user->setPassword($this->passwordHasher->hashPassword($user, $content['password']));
+        }
         $user->setRoles([$content['role']]);
         $user->setName($content['name']);
 
@@ -106,7 +115,7 @@ class UserController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json([
-            'message' => 'User created'
+            'message' => 'User created or updated'
         ], 201);
     }
 
@@ -120,4 +129,5 @@ class UserController extends AbstractController
             'message' => 'User deleted'
         ]);
     }
+
 }
