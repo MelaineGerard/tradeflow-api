@@ -109,4 +109,15 @@ class UserController extends AbstractController
             'message' => 'User created'
         ], 201);
     }
+
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(User $user): JsonResponse
+    {
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'message' => 'User deleted'
+        ]);
+    }
 }
