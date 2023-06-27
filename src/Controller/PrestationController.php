@@ -26,10 +26,10 @@ class PrestationController extends AbstractController
     #[Route('/', name: 'index')]
     public function index(): JsonResponse
     {
-        $clients = $this->prestationRepository->findAll();
+        $prestations = $this->prestationRepository->findAll();
 
 
-        return $this->json($clients);
+        return $this->json($prestations);
 
 
     }
